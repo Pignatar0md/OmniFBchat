@@ -51,7 +51,6 @@ app.post("/", function (req, res) {
              'Mi primer pagina</h1></body></html>');
 });*/
 app.get('/webhook', function(req, res) {
-  console.log(req.query);
   if (req.query['hub.mode'] === 'subscribe' &&
       req.query['hub.verify_token'] === pass) {
     console.log("Validating webhook");
@@ -88,6 +87,7 @@ app.post('/webhook', function (req, res) {
   }
 });
 function receivedMessage(event, request, response) {
+  console.log(event);
   var senderID = event.sender.id;
   var recipientID = event.recipient.id;
   var timeOfMessage = event.timestamp;
@@ -125,90 +125,47 @@ function receivedMessage(event, request, response) {
     });
 //********************************************************
     switch (messageText) {
-      case 'image':
-        sendImageMessage(senderID);
-        break;
-      case 'gif':
-        sendGifMessage(senderID);
-        break;
-      case 'audio':
-        sendAudioMessage(senderID);
-        break;
-      case 'video':
-        sendVideoMessage(senderID);
-        break;
       case 'file':
         sendFileMessage(senderID);
         break;
-      case 'button':
-        sendButtonMessage(senderID);
-        break;
-      case 'generic':
-        sendGenericMessage(senderID);
-        break;
-      case 'receipt':
-        sendReceiptMessage(senderID);
-        break;
-      case 'quick reply':
-        sendQuickReply(senderID);
-        break;
-      case 'read receipt':
-        sendReadReceipt(senderID);
-        break;
-      case 'typing on':
-        sendTypingOn(senderID);
-        break;
-      case 'typing off':
-        sendTypingOff(senderID);
-        break;
-      case 'account linking':
-        sendAccountLinking(senderID);
-        break;
       default:
+        //saveTextMessage(senderID, messageText, recipientId, timeOfMessage);
         sendTextMessage(senderID, messageText);
     }
   } else if (messageAttachments) {
     sendTextMessage(senderID, "Message with attachment received");
   }
 }
-/*function sendImageMessage(recipientId) {
-  var messageData = {
-    recipient: {
-      id: recipientId
-    },
-    message: {
-      attachment: {
-        type: "image",
-        payload: {
-          url: SERVER_URL + "/assets/rift.png"
-        }
-      }
-    }
-  };
-  callSendAPI(messageData);
-}*/
-function sendTextMessage(recipientId, messageText) {
-  var messageData = {
-    recipient: {
-      id: recipientId
-    },
-    message: {
-      text: 'hooola soy BOt',
-      metadata: "DEVELOPER_DEFINED_METADATA"
-    }
-  };
-  // SAVE MESSAGE TO MYSQL------------------------------------------------------
+
+function saveTextMessage(recipientId, messageText, userName, timeInit, dateInit, callId) {
   var row = {
-    id_recipiente: recipientId,
-    mensaje: messageText
+    recipient_id: recipientId,
+    fb_username: userName,
+    text_message: messageText,
+    time_i: timeInit,
+    date_i: dateInit,
+    call_id : callId
   };
-  cnn.query('insert into incomingMessage set ?', row, function(err, result) {
+  cnn.query('insert into active_calls set ?', row, function(err, result) {
     if (err){
       console.log(err);
       return;
     }
   });
   //----------------------------------------------------------------------------
+}
+
+function sendTextMessage(recipientId, messageText) {
+  var messageData = {
+    recipient: {
+      id: recipientId
+    },
+    message: {
+      text: '',
+      metadata: "DEVELOPER_DEFINED_METADATA"
+    }
+  };
+  // SAVE MESSAGE TO MYSQL------------------------------------------------------
   callSendAPI(messageData);
 }
 
