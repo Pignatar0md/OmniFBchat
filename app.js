@@ -160,7 +160,7 @@ function saveTextMessage(evt) {
   if(dia < 10) {
     dia = '0'+dia;
   }
-
+  var tiempo = hours+':'+mins+':'+secs;
   fecha = fecha.getFullYear()+'-'+mes+'-'+dia;
   var row = {
     recipient_id: evt.recipient.id,
