@@ -162,7 +162,7 @@ function sendTextMessage(recipientId, messageText) {
       id: recipientId
     },
     message: {
-      text: '',
+      text: 'hola soy Bottt',
       metadata: "DEVELOPER_DEFINED_METADATA"
     }
   };
