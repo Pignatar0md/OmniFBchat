@@ -139,7 +139,16 @@ function receivedMessage(event, request, response) {
 function saveTextMessage(evt) {
   var message = evt.message;
   var fecha = new Date();
-  fecha = fecha.getYear()+'-'+fecha.getMonth()+'-'+fecha.getDate();
+  var mes = fecha.getMonth();
+  mes = mes + 1;
+  if(mes < 10) {
+    mes = '0'+mes;
+  }
+  var dia = fecha.getDate();
+  if(dia < 10) {
+    dia = '0'+dia;
+  }
+  fecha = fecha.getFullYear()+'-'+mes+'-'+dia;
   var row = {
     recipient_id: evt.recipient.id,
     fb_username: evt.sender.id,
