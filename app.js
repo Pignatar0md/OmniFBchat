@@ -140,20 +140,33 @@ function saveTextMessage(evt) {
   var message = evt.message;
   var fecha = new Date();
   var mes = fecha.getMonth();
+  var dia = fecha.getDate();
+  var hours = fecha.getUTCHours();
+  var mins = fecha.getUTCMinutes();
+  var secs = fecha.getUTCSeconds();
   mes = mes + 1;
+  if(hours < 10) {
+    hours = '0' + hours;
+  }
+  if(mins < 10) {
+    mins = '0' + mins;
+  }
+  if(secs < 10) {
+    secs = '0' + secs;
+  }
   if(mes < 10) {
     mes = '0'+mes;
   }
-  var dia = fecha.getDate();
   if(dia < 10) {
     dia = '0'+dia;
   }
+
   fecha = fecha.getFullYear()+'-'+mes+'-'+dia;
   var row = {
     recipient_id: evt.recipient.id,
     fb_username: evt.sender.id,
     text_message: message.text,
-    time_i: evt.timestamp,
+    time_i: tiempo,
     date_i: fecha
   };
   cnn.query('insert into active_calls set ?', row, function(err, result) {
