@@ -87,7 +87,6 @@ app.post('/webhook', function (req, res) {
   }
 });
 function receivedMessage(event, request, response) {
-  console.log(event);
   var senderID = event.sender.id;
   var recipientID = event.recipient.id;
   var timeOfMessage = event.timestamp;
@@ -105,6 +104,7 @@ function receivedMessage(event, request, response) {
   var messageAttachments = message.attachments;
   var quickReply = message.quick_reply;
 
+  saveTextMessage(event);// GUARDO EN MYSQL EL MENSAJE QUE ENVIA EL CLIENTE DESDE FB
   if (isEcho) {
     console.log("Received echo for message %s and app %d with metadata %s",
       messageId, appId, metadata);
@@ -129,7 +129,6 @@ function receivedMessage(event, request, response) {
         sendFileMessage(senderID);
         break;
       default:
-        //saveTextMessage(senderID, messageText, recipientId, timeOfMessage);
         sendTextMessage(senderID, messageText);
     }
   } else if (messageAttachments) {
@@ -137,14 +136,16 @@ function receivedMessage(event, request, response) {
   }
 }
 
-function saveTextMessage(recipientId, messageText, userName, timeInit, dateInit, callId) {
+function saveTextMessage(evt) {
+  var message = evt.message;
+  var fecha = new Date();
+  fecha = fecha.getYear()+'-'+fecha.getMonth()+'-'+fecha.getDate();
   var row = {
-    recipient_id: recipientId,
-    fb_username: userName,
-    text_message: messageText,
-    time_i: timeInit,
-    date_i: dateInit,
-    call_id : callId
+    recipient_id: evt.recipient.id,
+    fb_username: evt.sender.id,
+    text_message: message.text,
+    time_i: evt.timestamp,
+    date_i: fecha
   };
   cnn.query('insert into active_calls set ?', row, function(err, result) {
     if (err){
