@@ -141,9 +141,9 @@ function saveTextMessage(evt) {
   var fecha = new Date();
   var mes = fecha.getMonth();
   var dia = fecha.getDate();
-  var hours = fecha.getUTCHours();
-  var mins = fecha.getUTCMinutes();
-  var secs = fecha.getUTCSeconds();
+  var hours = fecha.getHours();
+  var mins = fecha.getMinutes();
+  var secs = fecha.getSeconds();
   mes = mes + 1;
   if(hours < 10) {
     hours = '0' + hours;
