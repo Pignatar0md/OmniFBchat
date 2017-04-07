@@ -116,6 +116,7 @@ function receivedMessage(event, request, response) {
   var quickReply = message.quick_reply;
   // Me conecto a POSTGRE database y consulto los agentes online
   var onlineAgents = [];
+  var selectedAgent;
   client.connect(function (err) {
     if (err) throw err;
     client.query('SELECT id as agente_id from ominicontacto_app_agenteprofile where estado = 2', function (err, result) {
@@ -123,7 +124,7 @@ function receivedMessage(event, request, response) {
       for(var i = 0; i < result.rows.length; i++) {
         onlineAgents[i] = result.rows[i].agente_id;
       }
-      var selectedAgent = onlineAgents[Math.floor(Math.random() * onlineAgents.length)];
+      selectedAgent = onlineAgents[Math.floor(Math.random() * onlineAgents.length)];
       saveTextMessage(event, selectedAgent);// GUARDO EN MYSQL EL MENSAJE QUE ENVIA EL CLIENTE DESDE FB
       client.end(function (err) {
         if (err) throw err;
