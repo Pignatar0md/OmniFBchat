@@ -28,7 +28,8 @@ var client = new pg.Client({
       for(var i = 0; i < result.rows.length; i++) {
         onlineAgents[i] = result.rows[i].agente_id;
       }
-      console.log(onlineAgents);
+      var selectedAgent = onlineAgents[Math.floor(Math.random() * onlineAgents.length)];
+      console.log(selectedAgent);
       client.end(function (err) {
         if (err) throw err;
       });
