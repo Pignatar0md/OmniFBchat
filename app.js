@@ -19,25 +19,6 @@ var client = new pg.Client({
   port: 5432,
   host: "172.16.20.44"
 });
-// Me conecto a POSTGRE database y consulto los agentes online
-  var onlineAgents = [];
-  client.connect(function (err) {
-    if (err) throw err;
-    client.query('SELECT id as agente_id from ominicontacto_app_agenteprofile where estado = 2', function (err, result) {
-      if (err) throw err;
-      for(var i = 0; i < result.rows.length; i++) {
-        onlineAgents[i] = result.rows[i].agente_id;
-      }
-      var selectedAgent = onlineAgents[Math.floor(Math.random() * onlineAgents.length)];
-      console.log(selectedAgent);
-      client.end(function (err) {
-        if (err) throw err;
-      });
-    });
-  });
-
-//------------------------------------------------------------
-
 //************************************socket.io
 var svrForSocketIO = require('http').Server(express);
 svrForSocketIO.listen(8082);
@@ -132,8 +113,24 @@ function receivedMessage(event, request, response) {
   var messageText = message.text;
   var messageAttachments = message.attachments;
   var quickReply = message.quick_reply;
-
-  saveTextMessage(event);// GUARDO EN MYSQL EL MENSAJE QUE ENVIA EL CLIENTE DESDE FB
+  // Me conecto a POSTGRE database y consulto los agentes online
+  var onlineAgents = [];
+  var selectedAgent = "";
+  client.connect(function (err) {
+    if (err) throw err;
+    client.query('SELECT id as agente_id from ominicontacto_app_agenteprofile where estado = 2', function (err, result) {
+      if (err) throw err;
+      for(var i = 0; i < result.rows.length; i++) {
+        onlineAgents[i] = result.rows[i].agente_id;
+      }
+      selectedAgent = onlineAgents[Math.floor(Math.random() * onlineAgents.length)];
+      client.end(function (err) {
+        if (err) throw err;
+      });
+    });
+  });
+  //------------------------------------------------------------
+  saveTextMessage(event, selectedAgent);// GUARDO EN MYSQL EL MENSAJE QUE ENVIA EL CLIENTE DESDE FB
   if (isEcho) {
     console.log("Received echo for message %s and app %d with metadata %s",
       messageId, appId, metadata);
@@ -150,6 +147,7 @@ function receivedMessage(event, request, response) {
 //*************************************************socket.io
     io = require('socket.io')(svrForSocketIO);
     io.on('connection', function (socket) {
+      console.log();
       socket.emit('news', { message: messageText });
     });
 //********************************************************
@@ -165,7 +163,7 @@ function receivedMessage(event, request, response) {
   }
 }
 
-function saveTextMessage(evt) {
+function saveTextMessage(evt, agent) {
   var message = evt.message;
   var fecha = new Date();
   var mes = fecha.getMonth();
@@ -196,7 +194,8 @@ function saveTextMessage(evt) {
     fb_username: evt.sender.id,
     text_message: message.text,
     time_i: tiempo,
-    date_i: fecha
+    date_i: fecha,
+    agent_id: agent
   };
   cnn.query('insert into active_calls set ?', row, function(err, result) {
     if (err){
