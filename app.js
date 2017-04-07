@@ -131,8 +131,8 @@ function receivedMessage(event, request, response) {
   });
   //------------------------------------------------------------
   if (isEcho) {
-    console.log("Received echo for message %s and app %d with metadata %s",
-      messageId, appId, metadata);
+    //console.log("Received echo for message %s and app %d with metadata %s",
+      //messageId, appId, metadata);
     return;
   } else if (quickReply) {
     var quickReplyPayload = quickReply.payload;
@@ -146,7 +146,7 @@ function receivedMessage(event, request, response) {
 //*************************************************socket.io
     io = require('socket.io')(svrForSocketIO);
     io.on('connection', function (socket) {
-      console.log('OBJETO SOCKET: '+socket);
+      console.log('OBJETO SOCKET: '+JSON.stringify(socket));
       socket.emit('news', { message: messageText });
     });
 //********************************************************
