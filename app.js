@@ -9,6 +9,32 @@ var fs = require('fs');
 var express = require('express');
 var mysql = require('mysql');
 var app = express();
+//-----------------------------------------postgre
+var pg = require('pg');
+//ask for a client from the pool
+var client = new pg.Client({
+  user: "kamailio",
+  password: "kamailiorw",
+  database: "kamailio",
+  port: 5432,
+  host: "172.16.20.44"
+});
+// Me conecto a POSTGRE database y consulto los agentes online
+  var onlineAgents = [];
+  client.connect(function (err) {
+    if (err) throw err;
+    client.query('SELECT id as agente_id from ominicontacto_app_agenteprofile where estado = 2', function (err, result) {
+      if (err) throw err;
+      onlineAgents = result.rows;
+      console.log(onlineAgents);
+      client.end(function (err) {
+        if (err) throw err;
+      });
+    });
+  });
+
+//------------------------------------------------------------
+
 //************************************socket.io
 var svrForSocketIO = require('http').Server(express);
 svrForSocketIO.listen(8082);
@@ -27,17 +53,17 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: true
 }));
-// save user->message to mysql
+//--------------------------------------------------------------------- save user->message to mysql
 var cnn = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: 'marcelop',
+  host: '172.16.20.44',
+  user: 'nodefb',
+  password: 'H0l4ho1a321',
   database:'facebook'
 });
 
 cnn.connect(function(err) {
   if (err)
-    console.log('Problemas de conexion con mysql');
+    console.log('Problemas de conexion con mysql: '+err);
 });
 
 var httpServer = http.createServer(app);
@@ -103,7 +129,7 @@ function receivedMessage(event, request, response) {
   var messageText = message.text;
   var messageAttachments = message.attachments;
   var quickReply = message.quick_reply;
-
+  
   saveTextMessage(event);// GUARDO EN MYSQL EL MENSAJE QUE ENVIA EL CLIENTE DESDE FB
   if (isEcho) {
     console.log("Received echo for message %s and app %d with metadata %s",
