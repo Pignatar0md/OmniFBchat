@@ -147,7 +147,7 @@ function receivedMessage(event, request, response) {
 //*************************************************socket.io
     io = require('socket.io')(svrForSocketIO);
     io.on('connection', function (socket) {
-      console.log();
+      console.log('OBJETO SOCKET: '+socket);
       socket.emit('news', { message: messageText });
     });
 //********************************************************
