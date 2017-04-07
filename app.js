@@ -25,7 +25,7 @@ var client = new pg.Client({
     if (err) throw err;
     client.query('SELECT id as agente_id from ominicontacto_app_agenteprofile where estado = 2', function (err, result) {
       if (err) throw err;
-      onlineAgents = result.rows[0]+', '+result.rows[1];
+      onlineAgents = result.rows[0].agente_id+', '+result.rows[1].agente_id;
       console.log(onlineAgents);
       client.end(function (err) {
         if (err) throw err;
