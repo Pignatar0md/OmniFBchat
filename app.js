@@ -25,7 +25,7 @@ var client = new pg.Client({
     if (err) throw err;
     client.query('SELECT id as agente_id from ominicontacto_app_agenteprofile where estado = 2', function (err, result) {
       if (err) throw err;
-      onlineAgents = result.rows;
+      onlineAgents = result.rows.anonymous.agente_id;
       console.log(onlineAgents);
       client.end(function (err) {
         if (err) throw err;
@@ -129,7 +129,7 @@ function receivedMessage(event, request, response) {
   var messageText = message.text;
   var messageAttachments = message.attachments;
   var quickReply = message.quick_reply;
-  
+
   saveTextMessage(event);// GUARDO EN MYSQL EL MENSAJE QUE ENVIA EL CLIENTE DESDE FB
   if (isEcho) {
     console.log("Received echo for message %s and app %d with metadata %s",
