@@ -9,6 +9,7 @@ var fs = require('fs');
 var express = require('express');
 var mysql = require('mysql');
 var app = express();
+var agIdPersocketId = [];
 //-----------------------------------------postgre
 var pg = require('pg');
 //ask for a client from the pool
@@ -144,9 +145,10 @@ function receivedMessage(event, request, response) {
 
   if (messageText) {
 //*************************************************socket.io
+    console.log('agente sElecionado!!: '+selectedAgent);
     io = require('socket.io')(svrForSocketIO);
     io.on('connection', function (socket) {
-      console.log('ID del OBJETO SOCKET: '+socket.id);
+      agIdPersocketId[selectedAgent] = socket.id;
       socket.emit('news', { message: messageText });
     });
 //********************************************************
