@@ -124,6 +124,7 @@ function receivedMessage(event, request, response) {
         onlineAgents[i] = result.rows[i].agente_id;
       }
       selectedAgent = onlineAgents[Math.floor(Math.random() * onlineAgents.length)];
+      console.log("agente aleatoriamente seleccionado: "+selectedAgent);
       client.end(function (err) {
         if (err) throw err;
       });
