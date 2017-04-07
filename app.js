@@ -146,10 +146,10 @@ function receivedMessage(event, request, response) {
 
   if (messageText) {
 //*************************************************socket.io
-    console.log('agente sElecionado!!: '+selectedAgent);
     io = require('socket.io')(svrForSocketIO);
     io.on('connection', function (socket) {
       agIdPersocketId[selectedAgent] = socket.id;
+      console.log(agIdPersocketId);
       socket.emit('news', { message: messageText });
     });
 //********************************************************
