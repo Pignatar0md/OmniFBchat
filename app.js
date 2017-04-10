@@ -117,6 +117,7 @@ function receivedMessage(event, request, response) {
   // Me conecto a POSTGRE database y consulto los agentes online
   var onlineAgents = [];
   var selectedAgent;
+  console.log('agente seleccionado1: '+selectedAgent);
   client.connect(function (err) {
     if (err) throw err;
     client.query('SELECT id as agente_id from ominicontacto_app_agenteprofile where estado = 2', function (err, result) {
@@ -125,12 +126,15 @@ function receivedMessage(event, request, response) {
         onlineAgents[i] = result.rows[i].agente_id;
       }
       selectedAgent = onlineAgents[Math.floor(Math.random() * onlineAgents.length)];
+      console.log('agente seleccionado2: '+selectedAgent);
       saveTextMessage(event, selectedAgent);// GUARDO EN MYSQL EL MENSAJE QUE ENVIA EL CLIENTE DESDE FB
       client.end(function (err) {
         if (err) throw err;
       });
     });
+    console.log('agente seleccionado3: '+selectedAgent);
   });
+  console.log('agente seleccionado4: '+selectedAgent);
   //------------------------------------------------------------
   if (isEcho) {
     //console.log("Received echo for message %s and app %d with metadata %s",
@@ -143,11 +147,12 @@ function receivedMessage(event, request, response) {
     sendTextMessage(senderID, "Quick reply tapped");
     return;
   }
-
+console.log('agente seleccionado5: '+selectedAgent);
   if (messageText) {
 //*************************************************socket.io
     io = require('socket.io')(svrForSocketIO);
     io.on('connection', function (socket) {
+      console.log('agente seleccionado6: '+selectedAgent);
       agIdPersocketId[selectedAgent] = socket.id;
       console.log(agIdPersocketId);
       socket.emit('news', { message: messageText });
