@@ -11,15 +11,8 @@ var mysql = require('mysql');
 var app = express();
 var agtIdsocketId = new Array();
 //-----------------------------------------------------POSTGRE
-var pg = require('pg');
+const postgrePool = require('./lib/pgdb');
 //ask for a client from the pool
-var pgClient = new pg.Client({
-  user: "kamailio",
-  password: "kamailiorw",
-  database: "kamailio",
-  port: 5432,
-  host: "172.16.20.47"
-});
 //************************************socket.io
 var svrForSocketIO = require('http').Server(express);
 svrForSocketIO.listen(8082);
@@ -117,19 +110,17 @@ function receivedMessage(event, request, response) {
   // Me conecto a POSTGRE database y consulto los agentes online
   var onlineAgents = [];
   var selectedAgent;
-  pgClient.connect(function (err) {
-    if (err) throw err;
-    pgClient.query('SELECT id as agente_id from ominicontacto_app_agenteprofile where estado = 2', function (err, result) {
-      if (err) throw err;
-      for(var i = 0; i < result.rows.length; i++) {
-        onlineAgents[i] = result.rows[i].agente_id;
-      }
-      selectedAgent = onlineAgents[Math.floor(Math.random() * onlineAgents.length)];
-      saveTextMessage(event, selectedAgent);// GUARDO EN MYSQL EL MENSAJE QUE ENVIA EL CLIENTE DESDE FB
-      pgClient.end(function (err) {
-        if (err) throw err;
-      });
-    });
+
+  postgrePool.query('SELECT id as agente_id from ominicontacto_app_agenteprofile where estado = 2',
+  function (err, result) {
+    if (err) {
+      return console.log(err);
+    }
+    for(var i = 0; i < result.rows.length; i++) {
+      onlineAgents[i] = result.rows[i].agente_id;
+    }
+    selectedAgent = onlineAgents[Math.floor(Math.random() * onlineAgents.length)];
+    saveTextMessage(event, selectedAgent);// GUARDO EN MYSQL EL MENSAJE QUE ENVIA EL CLIENTE DESDE FB
   });
   //------------------------------------------------------------
   if (isEcho) {
