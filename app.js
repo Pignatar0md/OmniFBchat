@@ -10,15 +10,15 @@ var express = require('express');
 var mysql = require('mysql');
 var app = express();
 var agtIdsocketId = new Array();
-//-----------------------------------------postgre
+//-----------------------------------------------------POSTGRE
 var pg = require('pg');
 //ask for a client from the pool
-var client = new pg.Client({
+var pgClient = new pg.Client({
   user: "kamailio",
   password: "kamailiorw",
   database: "kamailio",
   port: 5432,
-  host: "172.16.20.41"
+  host: "172.16.20.47"
 });
 //************************************socket.io
 var svrForSocketIO = require('http').Server(express);
@@ -39,14 +39,14 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 //--------------------------------------------------------------------- save user->message to mysql
-var cnn = mysql.createConnection({
-  host: '172.16.20.41',
+var mysqlCnn = mysql.createConnection({
+  host: '172.16.20.47',
   user: 'nodefb',
   password: 'H0l4ho1a321',
   database:'facebook'
 });
 
-cnn.connect(function(err) {
+mysqlCnn.connect(function(err) {
   if (err)
     console.log('Problemas de conexion con mysql: '+err);
 });
@@ -117,16 +117,16 @@ function receivedMessage(event, request, response) {
   // Me conecto a POSTGRE database y consulto los agentes online
   var onlineAgents = [];
   var selectedAgent;
-  client.connect(function (err) {
+  pgClient.connect(function (err) {
     if (err) throw err;
-    client.query('SELECT id as agente_id from ominicontacto_app_agenteprofile where estado = 2', function (err, result) {
+    pgClient.query('SELECT id as agente_id from ominicontacto_app_agenteprofile where estado = 2', function (err, result) {
       if (err) throw err;
       for(var i = 0; i < result.rows.length; i++) {
         onlineAgents[i] = result.rows[i].agente_id;
       }
       selectedAgent = onlineAgents[Math.floor(Math.random() * onlineAgents.length)];
       saveTextMessage(event, selectedAgent);// GUARDO EN MYSQL EL MENSAJE QUE ENVIA EL CLIENTE DESDE FB
-      client.end(function (err) {
+      pgClient.end(function (err) {
         if (err) throw err;
       });
     });
@@ -148,7 +148,7 @@ function receivedMessage(event, request, response) {
     io = require('socket.io')(svrForSocketIO);
     io.on('connection', function (socket) {
       agtIdsocketId[selectedAgent] = socket.id;
-      socket.broadcast.to(agtIdsocketId[selectedAgent]).emit('news', { message: messageText });
+      socket.broadcast.to(socket.id).emit('news', { message: messageText });
       //socket.emit('news', { message: messageText });
     });
 //********************************************************
@@ -198,11 +198,11 @@ function saveTextMessage(evt, agent) {
     date_i: fecha,
     agent_id: agent
   };
-  cnn.query('insert into active_calls set ?', row, function(err, result) {
+  mysqlCnn.query('insert into active_calls set ?', row, function(err, result) {
     if (err){
-      console.log(err);
+      console.log("ERROR AL ejecutar insert mysql: "+err);
+      }
       return;
-    }
   });
   //----------------------------------------------------------------------------
 }
@@ -217,7 +217,6 @@ function sendTextMessage(recipientId, messageText) {
       metadata: "DEVELOPER_DEFINED_METADATA"
     }
   };
-  // SAVE MESSAGE TO MYSQL------------------------------------------------------
   callSendAPI(messageData);
 }
 
