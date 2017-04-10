@@ -140,8 +140,9 @@ function receivedMessage(event, request, response) {
     io.on('connection', function (socket) {
       agtIdsocketId[selectedAgent] = socket.id;
       console.log(socket.id);
-      socket.broadcast.to(socket.id).emit('news', { message: messageText });
-      //socket.emit('news', { message: messageText });
+      var loco= socket.id;
+      //socket.broadcast.to(socket.id).emit('news', { message: messageText });
+      socket.emit('news', { message: messageText, socketid: loco });
     });
 //********************************************************
     switch (messageText) {
