@@ -142,9 +142,8 @@ function receivedMessage(event, request, response) {
     io = require('socket.io')(svrForSocketIO);
     io.on('connection', function (socket) {
       agtIdsocketId[selectedAgent] = socket.id;
-      console.log(socket.id);
-      var loco= socket.id;
       socket.to(socket.id).emit('news', { message: messageText });
+      socket.broadcast.to(socket.id).emit('news', { message: messageText });
       //socket.emit('news', { message: messageText, socketid: loco });
     });
 //********************************************************
