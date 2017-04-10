@@ -9,7 +9,7 @@ var fs = require('fs');
 var express = require('express');
 var mysql = require('mysql');
 var app = express();
-var agIdPersocketId = [];
+var agtIdsocketId = new Array();
 //-----------------------------------------postgre
 var pg = require('pg');
 //ask for a client from the pool
@@ -18,7 +18,7 @@ var client = new pg.Client({
   password: "kamailiorw",
   database: "kamailio",
   port: 5432,
-  host: "172.16.20.44"
+  host: "172.16.20.41"
 });
 //************************************socket.io
 var svrForSocketIO = require('http').Server(express);
@@ -40,7 +40,7 @@ app.use(bodyParser.urlencoded({
 }));
 //--------------------------------------------------------------------- save user->message to mysql
 var cnn = mysql.createConnection({
-  host: '172.16.20.44',
+  host: '172.16.20.41',
   user: 'nodefb',
   password: 'H0l4ho1a321',
   database:'facebook'
@@ -117,7 +117,6 @@ function receivedMessage(event, request, response) {
   // Me conecto a POSTGRE database y consulto los agentes online
   var onlineAgents = [];
   var selectedAgent;
-  console.log('agente seleccionado1: '+selectedAgent);
   client.connect(function (err) {
     if (err) throw err;
     client.query('SELECT id as agente_id from ominicontacto_app_agenteprofile where estado = 2', function (err, result) {
@@ -153,8 +152,8 @@ console.log('agente seleccionado5: '+selectedAgent);
     io = require('socket.io')(svrForSocketIO);
     io.on('connection', function (socket) {
       console.log('agente seleccionado6: '+selectedAgent);
-      agIdPersocketId[selectedAgent] = socket.id;
-      console.log(agIdPersocketId);
+      agtIdsocketId[selectedAgent] = socket.id;
+      console.log(agtIdsocketId);
       socket.emit('news', { message: messageText });
     });
 //********************************************************
