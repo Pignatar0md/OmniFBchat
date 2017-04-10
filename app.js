@@ -153,7 +153,7 @@ console.log('agente seleccionado5: '+selectedAgent);
     io.on('connection', function (socket) {
       console.log('agente seleccionado6: '+selectedAgent);
       agtIdsocketId[selectedAgent] = socket.id;
-      console.log(agtIdsocketId);
+      console.log(agtIdsocketId[selectedAgent]);
       socket.emit('news', { message: messageText });
     });
 //********************************************************
