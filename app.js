@@ -147,9 +147,9 @@ function receivedMessage(event, request, response) {
 //*************************************************socket.io
     io = require('socket.io')(svrForSocketIO);
     io.on('connection', function (socket) {
-      agtIdsocketId[selectedAgent] = socket.client;
-      console.log(agtIdsocketId[selectedAgent]);
-      socket.emit('news', { message: messageText });
+      agtIdsocketId[selectedAgent] = socket.id;
+      socket.broadcast.to(agtIdsocketId[selectedAgent]).emit('news', { message: messageText });
+      //socket.emit('news', { message: messageText });
     });
 //********************************************************
     switch (messageText) {
