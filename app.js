@@ -17,9 +17,6 @@ const postgrePool = require('./lib/pgdb');
 var svrForSocketIO = require('http').Server(express);
 svrForSocketIO.listen(8082);
 var io = '';
-io.on('responseDialog', function(data) {
-  console.log(data);
-});
 //*********************************************
 var token = "EAAFE5ZCAyP2oBAFee4EfoVGz6ZAIU7HLv0T2bIXKikhYXxiSwD4Ujb3oU6198g4H9P9qBuckY2AwOl6x9j1tWieaURx3RhyGjpt8FUxWBReWEZCu4iVMC9gvaWGZAmn320FdkFPKMicy910p2ln4WxQYEDIlF0ZBJAFnMQaZCTeQZDZD";
 var pass = "my_password_here";
@@ -140,6 +137,9 @@ function receivedMessage(event, request, response) {
   if (messageText) {
 //*************************************************socket.io
     io = require('socket.io')(svrForSocketIO);
+    io.on('responseDialog', function(data) {
+      console.log(data);
+    });
     io.on('connection', function (socket) {
       //agtIdsocketId[selectedAgent] = socket.id;
       //socket.to(socket.id).emit('news', { message: messageText });
