@@ -137,9 +137,6 @@ function receivedMessage(event, request, response) {
   if (messageText) {
 //*************************************************socket.io
     io = require('socket.io')(svrForSocketIO);
-    io.on('responseDialog', function(data) {
-      console.log(data);
-    });
     io.on('connection', function (socket) {
       //agtIdsocketId[selectedAgent] = socket.id;
       //socket.to(socket.id).emit('news', { message: messageText });
