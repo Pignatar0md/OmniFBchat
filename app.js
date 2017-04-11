@@ -17,7 +17,7 @@ const postgrePool = require('./lib/pgdb');
 var svrForSocketIO = require('http').Server(express);
 svrForSocketIO.listen(8082);
 var io = '';
-io.on('news', function(data) {
+io.on('responseDialog', function(data) {
   console.log(data);
 });
 //*********************************************
@@ -36,7 +36,7 @@ app.use(bodyParser.urlencoded({
 }));
 //--------------------------------------------------------------------- save user->message to mysql
 var mysqlCnn = mysql.createConnection({
-  host: '172.16.20.47',
+  host: '172.16.20.42',
   user: 'nodefb',
   password: 'H0l4ho1a321',
   database:'facebook'
@@ -141,10 +141,10 @@ function receivedMessage(event, request, response) {
 //*************************************************socket.io
     io = require('socket.io')(svrForSocketIO);
     io.on('connection', function (socket) {
-      agtIdsocketId[selectedAgent] = socket.id;
-      socket.to(socket.id).emit('news', { message: messageText });
-      socket.broadcast.to(socket.id).emit('news', { message: messageText });
-      //socket.emit('news', { message: messageText, socketid: loco });
+      //agtIdsocketId[selectedAgent] = socket.id;
+      //socket.to(socket.id).emit('news', { message: messageText });
+      //socket.broadcast.to(socket.id).emit('news', { message: messageText });
+      socket.emit('news', { message: messageText, agentId: selectedAgent });
     });
 //********************************************************
     switch (messageText) {
