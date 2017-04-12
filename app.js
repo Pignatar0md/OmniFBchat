@@ -138,10 +138,18 @@ function receivedMessage(event, request, response) {
 //*************************************************socket.io
     io = require('socket.io')(svrForSocketIO);
     io.on('connection', function (socket) {
-      console.log('a user connected: ' + socket.id);
-
+      var row = {
+        agent_id: data.agent_id,
+        fb_username: data.fbuser_id
+      };
       socket.on('responseDialog', function(data) {
-        console.log(data);
+        mysqlCnn.query('select recipient_id from active_calls where agent_id = ? and fb_username like ?', row, function(err, result) {
+          if (err){
+            console.log("ERROR AL ejecutar insert mysql: "+err);
+
+            }
+            console.log(result);
+        });
       });
       agtIdsocketId[selectedAgent] = socket.id;
       //socket.to(socket.id).emit('news', { message: messageText });
