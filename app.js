@@ -32,14 +32,15 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 //--------------------------------------------------------------------- save user->message to mysql
-var mysqlCnn = mysql.createConnection({
+var mysqlCnn = mysql.createPool({
+  connectionLimit : 10,
   host: '172.16.20.42',
   user: 'nodefb',
   password: 'H0l4ho1a321',
   database:'facebook'
 });
 
-mysqlCnn.connect(function(err) {
+mysqlCnn.getConnection(function(err) {
   if (err)
     console.log('Problemas de conexion con mysql: '+err);
 });
@@ -139,10 +140,10 @@ function receivedMessage(event, request, response) {
     io = require('socket.io')(svrForSocketIO);
     io.on('connection', function (socket) {
       socket.on('responseDialog', function(data) {
-        var row = {
-          agent_id: data.agent_id,
-          fb_username: data.fbuser_id
-        };
+        var row = [
+          data.agent_id,
+          data.fbuser_id
+        ];
         mysqlCnn.query('select recipient_id from active_calls where agent_id = ? and fb_username like ?', row, function(err, result) {
           if (err){
             console.log("ERROR AL ejecutar insert mysql: "+err);
