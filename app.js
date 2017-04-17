@@ -152,17 +152,19 @@ function receivedMessage(event, request, response) {
       socket.emit('news', { message: messageText, agentId: selectedAgent, call_id: call_id });
 
       socket.on('responseDialog', function(data) {
+        console.log(data);
         var row = {
           agent_id: data.agent_id,
           fb_username: data.fbuser_id,
           call_id: call_id
         };
-        /*mysqlCnn.query('insert into active_calls set ?', row, function(err, result) {
+        // inserto el mensaje enviado por el agente OmniLeads a usuario de Facebook
+        mysqlCnn.query('insert into active_calls set ?', row, function(err, result) {
           if (err){
             console.log("ERROR AL ejecutar insert mysql: "+err);
             }
             return;
-        });*/
+        });
       });
       //socket.to(socket.id).emit('news', { message: messageText });
       //socket.broadcast.to(socket.id).emit('news', { message: messageText });
