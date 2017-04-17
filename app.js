@@ -152,11 +152,14 @@ function receivedMessage(event, request, response) {
       socket.emit('news', { message: messageText, agentId: selectedAgent, call_id: call_id, recipient_id: recipientID });
 
       socket.on('responseDialog', function(data) {
+        var time = getFechaHora();
         var row = {
           text_message: data.message,
           agent_id: data.agent_id,
           fb_username: data.fbuser_id,
           call_id: data.call_id,
+          time_i: time[1],
+          date_i: time[0],
           recipient_id: data.recipient_id
         };
         // inserto el mensaje enviado por el agente OmniLeads a usuario de Facebook
@@ -184,9 +187,7 @@ function receivedMessage(event, request, response) {
   }
 }
 
-function saveTextMessage(evt, agent) {
-  var callid = evt.callid;
-  var message = evt.message;
+function getFechaHora() {
   var fecha = new Date();
   var mes = fecha.getMonth();
   var dia = fecha.getDate();
@@ -209,14 +210,22 @@ function saveTextMessage(evt, agent) {
   if(dia < 10) {
     dia = '0'+dia;
   }
-  var tiempo = hours+':'+mins+':'+secs;
+  var hora = hours+':'+mins+':'+secs;
   fecha = fecha.getFullYear()+'-'+mes+'-'+dia;
+  var tiempo = [fecha, hora];
+  return tiempo;
+}
+
+function saveTextMessage(evt, agent) {
+  var callid = evt.callid;
+  var message = evt.message;
+  var time = getFechaHora();
   var row = {
     recipient_id: evt.recipient.id,
     fb_username: evt.sender.id,
     text_message: message.text,
-    time_i: tiempo,
-    date_i: fecha,
+    time_i: time[1],
+    date_i: time[0],
     call_id: callid,
     agent_id: agent
   };
