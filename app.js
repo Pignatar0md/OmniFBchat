@@ -127,7 +127,7 @@ function receivedMessage(event, request, response) {
       onlineAgents[i] = result.rows[i].agente_id;
     }
     selectedAgent = onlineAgents[Math.floor(Math.random() * onlineAgents.length)];
-    event.callid = call_id;
+    event.callid = parseInt(call_id);
     saveTextMessage(event, selectedAgent);// GUARDO EN MYSQL EL MENSAJE QUE ENVIA EL CLIENTE DESDE FB
   });
   //------------------------------------------------------------
@@ -162,6 +162,7 @@ function receivedMessage(event, request, response) {
       agtIdsocketId[selectedAgent] = socket.id;
       //socket.to(socket.id).emit('news', { message: messageText });
       //socket.broadcast.to(socket.id).emit('news', { message: messageText });
+      console.log(" mensaje WEBSOCKET enviado ");
       socket.emit('news', { message: messageText, agentId: selectedAgent, call_id: call_id });
     });
 //********************************************************
