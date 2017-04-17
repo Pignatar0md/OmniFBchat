@@ -149,7 +149,7 @@ function receivedMessage(event, request, response) {
 
       agtIdsocketId[selectedAgent] = socket.id;
       console.log(" mensaje WEBSOCKET enviado ");
-      socket.emit('news', { message: messageText, agentId: selectedAgent, call_id: call_id });
+      socket.emit('news', { message: messageText, agentId: selectedAgent, call_id: call_id, recipient_id: recipientID });
 
       socket.on('responseDialog', function(data) {
         console.log(data);
@@ -218,6 +218,7 @@ function saveTextMessage(evt, agent) {
     call_id: callid,
     agent_id: agent
   };
+  //inserto el mensaje que viene desde un usuario de facebook a un agente de OmniLeads
   mysqlCnn.query('insert into active_calls set ?', row, function(err, result) {
     if (err){
       console.log("ERROR AL ejecutar insert mysql: "+err);
