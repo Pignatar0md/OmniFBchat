@@ -169,7 +169,7 @@ function receivedMessage(event, request, response) {
             }
             return;
         });
-        setTimeout(sendTextMessage(senderID, row.text_message, 0), 6000);
+        setTimeout(function() {sendTextMessage(senderID, row.text_message, 0);}, 6000);
       });
       //socket.to(socket.id).emit('news', { message: messageText });
       //socket.broadcast.to(socket.id).emit('news', { message: messageText });
