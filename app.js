@@ -139,7 +139,7 @@ function receivedMessage(event, request, response) {
     var quickReplyPayload = quickReply.payload;
     console.log("Quick reply for message %s with payload %s",
       messageId, quickReplyPayload);
-    sendTextMessage(senderID, "Quick reply tapped");
+    sendTextMessage(senderID, "Quick reply tapped", 1);
     return;
   }
   if (messageText) {
@@ -152,7 +152,6 @@ function receivedMessage(event, request, response) {
       socket.emit('news', { message: messageText, agentId: selectedAgent, call_id: call_id, recipient_id: recipientID });
 
       socket.on('responseDialog', function(data) {
-        console.log(data);
         var row = {
           text_message: data.message,
           agent_id: data.agent_id,
@@ -167,6 +166,7 @@ function receivedMessage(event, request, response) {
             }
             return;
         });
+        setTimeout(sendTextMessage(senderID, row.text_message, 0), 6000);
       });
       //socket.to(socket.id).emit('news', { message: messageText });
       //socket.broadcast.to(socket.id).emit('news', { message: messageText });
@@ -177,10 +177,10 @@ function receivedMessage(event, request, response) {
         sendFileMessage(senderID);
         break;
       default:
-        sendTextMessage(senderID, messageText);
+        sendTextMessage(senderID, messageText, 1);
     }
   } else if (messageAttachments) {
-    sendTextMessage(senderID, "Message with attachment received");
+    sendTextMessage(senderID, "Message with attachment received", 1);
   }
 }
 
@@ -230,16 +230,28 @@ function saveTextMessage(evt, agent) {
   //----------------------------------------------------------------------------
 }
 
-function sendTextMessage(recipientId, messageText) {
-  var messageData = {
-    recipient: {
-      id: recipientId
-    },
-    message: {
-      text: 'hola soy Bottt',
-      metadata: "DEVELOPER_DEFINED_METADATA"
-    }
-  };
+function sendTextMessage(recipientId, messageText, Bot) {
+  if(Bot === 1) {
+    var messageData = {
+      recipient: {
+        id: recipientId
+      },
+      message: {
+        text: 'hola soy Bottt',
+        metadata: "DEVELOPER_DEFINED_METADATA"
+      }
+    };
+  } else {
+    var messageData = {
+      recipient: {
+        id: recipientId
+      },
+      message: {
+        text: messageText,
+        metadata: "DEVELOPER_DEFINED_METADATA"
+      }
+    };
+  }
   callSendAPI(messageData);
 }
 
