@@ -91,6 +91,11 @@ app.post('/webhook', function (req, res) {
     res.sendStatus(200);
   }
 });
+
+function getRandomArbitrary(min, max) {
+    return Math.random() * (max - min) + min;
+}
+
 function receivedMessage(event, request, response) {
   var senderID = event.sender.id;
   var recipientID = event.recipient.id;
@@ -136,21 +141,22 @@ function receivedMessage(event, request, response) {
     return;
   }
   if (messageText) {
+    var call_id = getRandomArbitrary(1000, 1999999);
 //*************************************************socket.io
     io = require('socket.io')(svrForSocketIO);
     io.on('connection', function (socket) {
       socket.on('responseDialog', function(data) {
-        var row = [
-          data.agent_id,
-          data.fbuser_id
-        ];
-        mysqlCnn.query('select recipient_id from active_calls where agent_id = ? and fb_username like ?', row, function(err, result) {
+        var row = {
+          agent_id: data.agent_id,
+          fb_username: data.fbuser_id,
+          call_id: call_id
+        };
+        /*mysqlCnn.query('insert into active_calls set ?', row, function(err, result) {
           if (err){
             console.log("ERROR AL ejecutar insert mysql: "+err);
-
             }
-            console.log(result);
-        });
+            return;
+        });*/
       });
       agtIdsocketId[selectedAgent] = socket.id;
       //socket.to(socket.id).emit('news', { message: messageText });
@@ -171,6 +177,7 @@ function receivedMessage(event, request, response) {
 }
 
 function saveTextMessage(evt, agent) {
+  var call_id = getRandomArbitrary(1000, 1999999);
   var message = evt.message;
   var fecha = new Date();
   var mes = fecha.getMonth();
@@ -202,6 +209,7 @@ function saveTextMessage(evt, agent) {
     text_message: message.text,
     time_i: tiempo,
     date_i: fecha,
+    call_id: call_id,
     agent_id: agent
   };
   mysqlCnn.query('insert into active_calls set ?', row, function(err, result) {
