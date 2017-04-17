@@ -156,7 +156,8 @@ function receivedMessage(event, request, response) {
         var row = {
           agent_id: data.agent_id,
           fb_username: data.fbuser_id,
-          call_id: call_id
+          call_id: data.call_id,
+          recipient_id: data.recipient_id
         };
         // inserto el mensaje enviado por el agente OmniLeads a usuario de Facebook
         mysqlCnn.query('insert into active_calls set ?', row, function(err, result) {
