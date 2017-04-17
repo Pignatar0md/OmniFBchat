@@ -154,6 +154,7 @@ function receivedMessage(event, request, response) {
       socket.on('responseDialog', function(data) {
         console.log(data);
         var row = {
+          text_message: data.message,
           agent_id: data.agent_id,
           fb_username: data.fbuser_id,
           call_id: data.call_id,
