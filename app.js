@@ -169,7 +169,8 @@ function receivedMessage(event, request, response) {
             }
             return;
         });
-        setTimeout(function() {sendTextMessage(senderID, row.text_message, 0);}, 6000);
+        var randSendingTime = getRandomArbitrary(2000, 9000);
+        setTimeout(function() {sendTextMessage(senderID, row.text_message, 0);}, randSendingTime);
       });
       //socket.to(socket.id).emit('news', { message: messageText });
       //socket.broadcast.to(socket.id).emit('news', { message: messageText });
@@ -246,7 +247,7 @@ function sendTextMessage(recipientId, messageText, Bot) {
         id: recipientId
       },
       message: {
-        text: 'hola soy Bottt',
+        text: 'Buen dia, pronto estara en contacto con un asesor',
         metadata: "DEVELOPER_DEFINED_METADATA"
       }
     };
