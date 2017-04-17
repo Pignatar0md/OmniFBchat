@@ -116,6 +116,7 @@ function receivedMessage(event, request, response) {
   // Me conecto a POSTGRE database y consulto los agentes online
   var onlineAgents = [];
   var selectedAgent;
+  var call_id = getRandomArbitrary(1000, 1999999);
 
   postgrePool.query('SELECT id as agente_id from ominicontacto_app_agenteprofile where estado = 2',
   function (err, result) {
@@ -126,6 +127,7 @@ function receivedMessage(event, request, response) {
       onlineAgents[i] = result.rows[i].agente_id;
     }
     selectedAgent = onlineAgents[Math.floor(Math.random() * onlineAgents.length)];
+    event.callid = call_id;
     saveTextMessage(event, selectedAgent);// GUARDO EN MYSQL EL MENSAJE QUE ENVIA EL CLIENTE DESDE FB
   });
   //------------------------------------------------------------
@@ -141,7 +143,6 @@ function receivedMessage(event, request, response) {
     return;
   }
   if (messageText) {
-    var call_id = getRandomArbitrary(1000, 1999999);
 //*************************************************socket.io
     io = require('socket.io')(svrForSocketIO);
     io.on('connection', function (socket) {
@@ -161,7 +162,7 @@ function receivedMessage(event, request, response) {
       agtIdsocketId[selectedAgent] = socket.id;
       //socket.to(socket.id).emit('news', { message: messageText });
       //socket.broadcast.to(socket.id).emit('news', { message: messageText });
-      socket.emit('news', { message: messageText, agentId: selectedAgent });
+      socket.emit('news', { message: messageText, agentId: selectedAgent, call_id: call_id });
     });
 //********************************************************
     switch (messageText) {
@@ -177,7 +178,7 @@ function receivedMessage(event, request, response) {
 }
 
 function saveTextMessage(evt, agent) {
-  var call_id = getRandomArbitrary(1000, 1999999);
+  var callid = evt.callid;
   var message = evt.message;
   var fecha = new Date();
   var mes = fecha.getMonth();
@@ -209,7 +210,7 @@ function saveTextMessage(evt, agent) {
     text_message: message.text,
     time_i: tiempo,
     date_i: fecha,
-    call_id: call_id,
+    call_id: callid,
     agent_id: agent
   };
   mysqlCnn.query('insert into active_calls set ?', row, function(err, result) {
