@@ -116,7 +116,7 @@ function receivedMessage(event, request, response) {
   // Me conecto a POSTGRE database y consulto los agentes online
   var onlineAgents = [];
   var selectedAgent;
-  var call_id = parseInt(getRandomArbitrary(1000, 1999999));
+  var call_id;
 
   postgrePool.query('SELECT id as agente_id from ominicontacto_app_agenteprofile where estado = 2',
   function (err, result) {
@@ -127,6 +127,24 @@ function receivedMessage(event, request, response) {
       onlineAgents[i] = result.rows[i].agente_id;
     }
     selectedAgent = onlineAgents[Math.floor(Math.random() * onlineAgents.length)];
+    // Verifico si call_id no existe
+    var mysqlArgs = [recipientID, senderID, selectedAgent];
+    mysqlCnn.query('select call_id from active_calls where recipient_id like ? and fb_username like ? and agent_id like ?',
+     ,
+     function(err, result) {
+      if (err){
+        console.log("ERROR AL ejecutar select de call_id mysql: "+err);
+        }
+        return;
+        if(!result.call_id) {
+          call_id = parseInt(getRandomArbitrary(1000, 1999999));
+        } else {
+          call_id = result.call_id;
+        }
+    });
+
+
+
     event.callid = call_id;
     saveTextMessage(event, selectedAgent);// GUARDO EN MYSQL EL MENSAJE QUE ENVIA EL CLIENTE DESDE FB
   });
