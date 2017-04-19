@@ -129,6 +129,7 @@ function receivedMessage(event, request, response) {
     selectedAgent = onlineAgents[Math.floor(Math.random() * onlineAgents.length)];
     // Verifico si call_id no existe
     var mysqlArgs = [recipientID, senderID, selectedAgent];
+    console.log(mysqlArgs);
     mysqlCnn.query('select call_id from active_calls where recipient_id like ? and fb_username like ? and agent_id like ?',
      mysqlArgs,
      function(err, result) {
