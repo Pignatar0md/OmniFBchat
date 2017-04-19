@@ -130,7 +130,7 @@ function receivedMessage(event, request, response) {
     // Verifico si call_id no existe
     var mysqlArgs = [recipientID, senderID, selectedAgent];
     mysqlCnn.query('select call_id from active_calls where recipient_id like ? and fb_username like ? and agent_id like ?',
-     ,
+     mysqlArgs,
      function(err, result) {
       if (err){
         console.log("ERROR AL ejecutar select de call_id mysql: "+err);
