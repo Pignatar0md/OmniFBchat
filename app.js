@@ -17,7 +17,35 @@ const postgrePool = require('./lib/pgdb');
 var svrForSocketIO = require('http').Server(express);
 svrForSocketIO.listen(8082);
 var io = require('socket.io')(svrForSocketIO);
-//*********************************************
+var messageText, selectedAgent, call_id, recipientID;
+    io.on('connection', function (socket) {
+
+      agtIdsocketId[selectedAgent] = socket.id;
+      socket.emit('news', { message: messageText, agentId: selectedAgent, call_id: call_id, recipient_id: recipientID });
+
+      socket.on('responseDialog', function(data) {
+        var time = getFechaHora();
+        var row = {
+          text_message: data.message,
+          agent_id: data.agent_id,
+          fb_username: data.fbuser_id,
+          call_id: data.call_id,
+          time_i: time[1],
+          date_i: time[0],
+          recipient_id: data.recipient_id
+        };
+        // inserto el mensaje enviado por el agente OmniLeads a usuario de Facebook
+        mysqlCnn.query('insert into active_calls set ?', row, function(err, result) {
+          if (err){
+            console.log("ERROR AL ejecutar insert mysql: "+err);
+            }
+            return;
+        });
+        var randSendingTime = getRandomArbitrary(2000, 9000);
+        setTimeout(function() {sendTextMessage(senderID, row.text_message, 0);}, randSendingTime);
+      });
+    });
+//********************************************************
 var token = "EAAFfj6S1khYBAPv2kbEbjGuCzgYMwMKGZAGD9BBJZC9NJktaIRpSwjqKLxEDGCjDGUSQjQzNKzxFKRLMHFmhg2ZBgKfKH7AAP8IuiVUJPYqZC223PRZChwpKayOdUIWgrXbkaToKAqkExZCATvT6pTSf0UP4mYRiw3RiRMX9k0swZDZD";
 var pass = "my_password_here";
 
@@ -78,9 +106,7 @@ app.post('/webhook', function (req, res) {
         if (messagingEvent.option) {
           receivedAuthentication(messagingEvent);
         } else if (messagingEvent.message) {
-          io.on('connection', function (socket) {
-            receivedMessage(messagingEvent, req, res, socket);
-          });
+          receivedMessage(messagingEvent, req, res);
         } else if (messagingEvent.delivery) {
           receivedDeliveryConfirmation(messagingEvent);
         } else if (messagingEvent.postback) {
@@ -98,9 +124,9 @@ function getRandomArbitrary(min, max) {
     return Math.random() * (max - min) + min;
 }
 
-function receivedMessage(event, request, response, socket) {
+function receivedMessage(event, request, response) {
   var senderID = event.sender.id;
-  var recipientID = event.recipient.id;
+  /*var*/ recipientID = event.recipient.id;
   var timeOfMessage = event.timestamp;
   var message = event.message;
 
@@ -112,13 +138,13 @@ function receivedMessage(event, request, response, socket) {
   var messageId = message.mid;
   var appId = message.app_id;
   var metadata = message.metadata;
-  var messageText = message.text;
+  /*var*/ messageText = message.text;
   var messageAttachments = message.attachments;
   var quickReply = message.quick_reply;
   // Me conecto a POSTGRE database y consulto los agentes online
   var onlineAgents = [];
-  var selectedAgent;
-  var call_id = parseInt(getRandomArbitrary(1000, 1999999));
+  //var selectedAgent;
+  /*var*/ call_id = parseInt(getRandomArbitrary(1000, 1999999));
 
   postgrePool.query('SELECT id as agente_id from ominicontacto_app_agenteprofile where estado = 2',
   function (err, result) {
@@ -145,37 +171,6 @@ function receivedMessage(event, request, response, socket) {
     return;
   }
   if (messageText) {
-//*************************************************socket.io
-
-      agtIdsocketId[selectedAgent] = socket.id;
-      console.log(" mensaje WEBSOCKET enviado ");
-      socket.emit('news', { message: messageText, agentId: selectedAgent, call_id: call_id, recipient_id: recipientID });
-
-      socket.on('responseDialog', function(data) {
-        var time = getFechaHora();
-        var row = {
-          text_message: data.message,
-          agent_id: data.agent_id,
-          fb_username: data.fbuser_id,
-          call_id: data.call_id,
-          time_i: time[1],
-          date_i: time[0],
-          recipient_id: data.recipient_id
-        };
-        // inserto el mensaje enviado por el agente OmniLeads a usuario de Facebook
-        mysqlCnn.query('insert into active_calls set ?', row, function(err, result) {
-          if (err){
-            console.log("ERROR AL ejecutar insert mysql: "+err);
-            }
-            return;
-        });
-        var randSendingTime = getRandomArbitrary(2000, 9000);
-        setTimeout(function() {sendTextMessage(senderID, row.text_message, 0);}, randSendingTime);
-      });
-      //socket.to(socket.id).emit('news', { message: messageText });
-      //socket.broadcast.to(socket.id).emit('news', { message: messageText });
-
-//********************************************************
     switch (messageText) {
       case 'file':
         sendFileMessage(senderID);
