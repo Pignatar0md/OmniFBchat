@@ -16,10 +16,9 @@ const postgrePool = require('./lib/pgdb');
 //************************************socket.io
 var svrForSocketIO = require('http').Server(express);
 svrForSocketIO.listen(8082);
-var io = require('socket.io')(svrForSocketIO);
+var io = '';
 //*********************************************
-var token = "EAAFfj6S1khYBAPv2kbEbjGuCzgYMwMKGZAGD9BBJZC9NJktaIRpSwjqKLxEDGCjDGUSQjQzNKzxFKRLMHFmhg2ZBgKfKH7AAP8IuiVUJPYqZC223PRZChwpKayOdUIWgrXbkaToKAqkExZCATvT6pTSf0UP4mYRiw3RiRMX9k0swZDZD";
-//var token = "EAAFE5ZCAyP2oBAFee4EfoVGz6ZAIU7HLv0T2bIXKikhYXxiSwD4Ujb3oU6198g4H9P9qBuckY2AwOl6x9j1tWieaURx3RhyGjpt8FUxWBReWEZCu4iVMC9gvaWGZAmn320FdkFPKMicy910p2ln4WxQYEDIlF0ZBJAFnMQaZCTeQZDZD";
+var token = "EAAFE5ZCAyP2oBAFee4EfoVGz6ZAIU7HLv0T2bIXKikhYXxiSwD4Ujb3oU6198g4H9P9qBuckY2AwOl6x9j1tWieaURx3RhyGjpt8FUxWBReWEZCu4iVMC9gvaWGZAmn320FdkFPKMicy910p2ln4WxQYEDIlF0ZBJAFnMQaZCTeQZDZD";
 var pass = "my_password_here";
 
 var privateKey  = fs.readFileSync('./www.freetech.com.ar.key', 'utf8');
@@ -68,7 +67,6 @@ app.get('/webhook', function(req, res) {
 });
 
 app.post('/webhook', function (req, res) {
-  io.on('connection', function (socket) {
   var data = req.body;
   // Make sure this is a page subscription
   if (data.object == 'page') {
@@ -80,7 +78,7 @@ app.post('/webhook', function (req, res) {
         if (messagingEvent.option) {
           receivedAuthentication(messagingEvent);
         } else if (messagingEvent.message) {
-          receivedMessage(messagingEvent, req, res, socket);
+          receivedMessage(messagingEvent, req, res);
         } else if (messagingEvent.delivery) {
           receivedDeliveryConfirmation(messagingEvent);
         } else if (messagingEvent.postback) {
@@ -93,13 +91,12 @@ app.post('/webhook', function (req, res) {
     res.sendStatus(200);
   }
 });
-});
 
 function getRandomArbitrary(min, max) {
     return Math.random() * (max - min) + min;
 }
 
-function receivedMessage(event, request, response, socket) {
+function receivedMessage(event, request, response) {
   var senderID = event.sender.id;
   var recipientID = event.recipient.id;
   var timeOfMessage = event.timestamp;
@@ -147,6 +144,9 @@ function receivedMessage(event, request, response, socket) {
   }
   if (messageText) {
 //*************************************************socket.io
+    io = require('socket.io')(svrForSocketIO);
+    io.on('connection', function (socket) {
+
       agtIdsocketId[selectedAgent] = socket.id;
       console.log(" mensaje WEBSOCKET enviado ");
       socket.emit('news', { message: messageText, agentId: selectedAgent, call_id: call_id, recipient_id: recipientID });
@@ -174,7 +174,7 @@ function receivedMessage(event, request, response, socket) {
       });
       //socket.to(socket.id).emit('news', { message: messageText });
       //socket.broadcast.to(socket.id).emit('news', { message: messageText });
-    //         IO
+    });
 //********************************************************
     switch (messageText) {
       case 'file':
