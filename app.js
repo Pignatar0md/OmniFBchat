@@ -17,13 +17,13 @@ const postgrePool = require('./lib/pgdb');
 var svrForSocketIO = require('http').Server(express);
 svrForSocketIO.listen(8082);
 var io = require('socket.io')(svrForSocketIO);
-var messageText, selectedAgent, call_id, recipientID, senderID;
+var messageText, selectedAgent, call_id, recipientID, senderID, emit;
     io.on('connection', function (socket) {
 
-      function emit() {
+      emit = function () {
         agtIdsocketId[selectedAgent] = socket.id;
         socket.emit('news', { message: messageText, agentId: selectedAgent, call_id: call_id, recipient_id: recipientID });
-      }
+      };
 
 
       socket.on('responseDialog', function(data) {
@@ -174,7 +174,7 @@ function receivedMessage(event, request, response) {
     return;
   }
   if (messageText) {
-    emit();
+    emit;
     switch (messageText) {
       case 'file':
         sendFileMessage(senderID);
