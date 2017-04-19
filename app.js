@@ -17,7 +17,7 @@ const postgrePool = require('./lib/pgdb');
 var svrForSocketIO = require('http').Server(express);
 svrForSocketIO.listen(8082);
 var io = require('socket.io')(svrForSocketIO);
-var messageText, selectedAgent, call_id, recipientID;
+var messageText, selectedAgent, call_id, recipientID, senderID;
     io.on('connection', function (socket) {
 
       agtIdsocketId[selectedAgent] = socket.id;
@@ -42,7 +42,7 @@ var messageText, selectedAgent, call_id, recipientID;
             return;
         });
         var randSendingTime = getRandomArbitrary(2000, 9000);
-        setTimeout(function() {sendTextMessage(senderID, row.text_message, 0);}, randSendingTime);
+        setTimeout(function() { sendTextMessage(senderID, row.text_message, 0); }, randSendingTime);
       });
     });
 //********************************************************
@@ -125,7 +125,7 @@ function getRandomArbitrary(min, max) {
 }
 
 function receivedMessage(event, request, response) {
-  var senderID = event.sender.id;
+  /*var*/ senderID = event.sender.id;
   /*var*/ recipientID = event.recipient.id;
   var timeOfMessage = event.timestamp;
   var message = event.message;
