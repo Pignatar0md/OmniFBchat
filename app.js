@@ -20,8 +20,11 @@ var io = require('socket.io')(svrForSocketIO);
 var messageText, selectedAgent, call_id, recipientID, senderID;
     io.on('connection', function (socket) {
 
-      agtIdsocketId[selectedAgent] = socket.id;
-      socket.emit('news', { message: messageText, agentId: selectedAgent, call_id: call_id, recipient_id: recipientID });
+      function emit() {
+        agtIdsocketId[selectedAgent] = socket.id;
+        socket.emit('news', { message: messageText, agentId: selectedAgent, call_id: call_id, recipient_id: recipientID });
+      }
+
 
       socket.on('responseDialog', function(data) {
         var time = getFechaHora();
@@ -171,6 +174,7 @@ function receivedMessage(event, request, response) {
     return;
   }
   if (messageText) {
+    emit();
     switch (messageText) {
       case 'file':
         sendFileMessage(senderID);
