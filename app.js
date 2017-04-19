@@ -17,37 +17,8 @@ const postgrePool = require('./lib/pgdb');
 var svrForSocketIO = require('http').Server(express);
 svrForSocketIO.listen(8082);
 var io = require('socket.io')(svrForSocketIO);
-var messageText, selectedAgent, call_id, recipientID, senderID, emit;
-    io.on('connection', function (socket) {
+var messageText, selectedAgent, call_id, recipientID, senderID;
 
-      emit = function () {
-        agtIdsocketId[selectedAgent] = socket.id;
-        socket.emit('news', { message: messageText, agentId: selectedAgent, call_id: call_id, recipient_id: recipientID });
-      };
-
-
-      socket.on('responseDialog', function(data) {
-        var time = getFechaHora();
-        var row = {
-          text_message: data.message,
-          agent_id: data.agent_id,
-          fb_username: data.fbuser_id,
-          call_id: data.call_id,
-          time_i: time[1],
-          date_i: time[0],
-          recipient_id: data.recipient_id
-        };
-        // inserto el mensaje enviado por el agente OmniLeads a usuario de Facebook
-        mysqlCnn.query('insert into active_calls set ?', row, function(err, result) {
-          if (err){
-            console.log("ERROR AL ejecutar insert mysql: "+err);
-            }
-            return;
-        });
-        var randSendingTime = getRandomArbitrary(2000, 9000);
-        setTimeout(function() { sendTextMessage(senderID, row.text_message, 0); }, randSendingTime);
-      });
-    });
 //********************************************************
 var token = "EAAFfj6S1khYBAPv2kbEbjGuCzgYMwMKGZAGD9BBJZC9NJktaIRpSwjqKLxEDGCjDGUSQjQzNKzxFKRLMHFmhg2ZBgKfKH7AAP8IuiVUJPYqZC223PRZChwpKayOdUIWgrXbkaToKAqkExZCATvT6pTSf0UP4mYRiw3RiRMX9k0swZDZD";
 var pass = "my_password_here";
@@ -110,6 +81,31 @@ app.post('/webhook', function (req, res) {
           receivedAuthentication(messagingEvent);
         } else if (messagingEvent.message) {
           receivedMessage(messagingEvent, req, res);
+          io.on('connection', function (socket) {
+            agtIdsocketId[selectedAgent] = socket.id;
+            socket.emit('news', { message: messageText, agentId: selectedAgent, call_id: call_id, recipient_id: recipientID });
+            socket.on('responseDialog', function(data) {
+              var time = getFechaHora();
+              var row = {
+                text_message: data.message,
+                agent_id: data.agent_id,
+                fb_username: data.fbuser_id,
+                call_id: data.call_id,
+                time_i: time[1],
+                date_i: time[0],
+                recipient_id: data.recipient_id
+              };
+              // inserto el mensaje enviado por el agente OmniLeads a usuario de Facebook
+              mysqlCnn.query('insert into active_calls set ?', row, function(err, result) {
+                if (err){
+                  console.log("ERROR AL ejecutar insert mysql: "+err);
+                  }
+                  return;
+              });
+              var randSendingTime = getRandomArbitrary(2000, 9000);
+              setTimeout(function() { sendTextMessage(senderID, row.text_message, 0); }, randSendingTime);
+            });
+          });
         } else if (messagingEvent.delivery) {
           receivedDeliveryConfirmation(messagingEvent);
         } else if (messagingEvent.postback) {
@@ -174,7 +170,6 @@ function receivedMessage(event, request, response) {
     return;
   }
   if (messageText) {
-    emit;
     switch (messageText) {
       case 'file':
         sendFileMessage(senderID);
