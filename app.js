@@ -168,6 +168,9 @@ function receivedMessage(event, request, response, socket) {
           call_id = result[0].call_id
         }
         event.callid = call_id;
+        console.log("Mensaje Server->Cliente enviado");
+        socket.emit('news', { message: messageText, agentId: selectedAgent, call_id: call_id, recipient_id: recipientID });
+
         saveTextMessage(event, selectedAgent);// GUARDO EN MYSQL EL MENSAJE QUE ENVIA EL CLIENTE DESDE FB
     });
   });
@@ -186,8 +189,6 @@ function receivedMessage(event, request, response, socket) {
   if (messageText) {
 //*************************************************socket.io
       //agtIdsocketId[selectedAgent] = socket.id;
-      console.log("Mensaje Server->Cliente enviado");
-      socket.emit('news', { message: messageText, agentId: selectedAgent, call_id: call_id, recipient_id: recipientID });
 
 
       //socket.to(socket.id).emit('news', { message: messageText });
