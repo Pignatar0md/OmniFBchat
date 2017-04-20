@@ -130,14 +130,13 @@ function receivedMessage(event, request, response) {
     mysqlArgs = [recipientID, senderID, selectedAgent];
 
     // Verifico si call_id no existe
-    mysqlCnn.query('select call_id from active_calls where recipient_id like ? and fb_username like ? and agent_id like ?',
+    mysqlCnn.query('select distinct call_id from active_calls where recipient_id like ? and fb_username like ? and agent_id like ?',
      mysqlArgs,
      function(err, result) {
       if (err){
         console.log("ERROR AL ejecutar select de call_id mysql: "+err);
         }
-        console.log(result.call_id);
-        if(!result.call_id) {
+        if(!result[0].call_id) {
           call_id = parseInt(getRandomArbitrary(1000, 1999999));
           console.log("callid geneado aleatoriamente, no existe en bd el id: " + call_id);
         } else {
