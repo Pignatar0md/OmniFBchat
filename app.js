@@ -117,7 +117,7 @@ function receivedMessage(event, request, response) {
   var onlineAgents = [];
   var selectedAgent;
   var call_id;
-
+  var mysqlArgs = [];
   postgrePool.query('SELECT id as agente_id from ominicontacto_app_agenteprofile where estado = 2',
   function (err, result) {
     if (err) {
@@ -127,9 +127,9 @@ function receivedMessage(event, request, response) {
       onlineAgents[i] = result.rows[i].agente_id;
     }
     selectedAgent = onlineAgents[Math.floor(Math.random() * onlineAgents.length)];
+    mysqlArgs = [recipientID, senderID, selectedAgent];
   });
   // Verifico si call_id no existe
-  var mysqlArgs = [recipientID, senderID, selectedAgent];
   console.log(mysqlArgs);
   mysqlCnn.query('select call_id from active_calls where recipient_id like ? and fb_username like ? and agent_id like ?',
    mysqlArgs,
