@@ -10,6 +10,7 @@ var express = require('express');
 var mysql = require('mysql');
 var app = express();
 var agtIdsocketId = new Array();
+var senderID = "";
 //-----------------------------------------------------POSTGRE
 const postgrePool = require('./lib/pgdb');
 //ask for a client from the pool
@@ -123,7 +124,7 @@ function getRandomArbitrary(min, max) {
 }
 
 function receivedMessage(event, request, response, socket) {
-  var senderID = event.sender.id;
+  senderID = event.sender.id;
   var recipientID = event.recipient.id;
   var timeOfMessage = event.timestamp;
   var message = event.message;
