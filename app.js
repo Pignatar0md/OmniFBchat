@@ -96,6 +96,7 @@ function getRandomArbitrary(min, max) {
     return Math.random() * (max - min) + min;
 }
 
+io.on('connection', function (socket) {
 function receivedMessage(event, request, response) {
   var senderID = event.sender.id;
   var recipientID = event.recipient.id;
@@ -159,8 +160,6 @@ function receivedMessage(event, request, response) {
   }
   if (messageText) {
 //*************************************************socket.io
-    io.on('connection', function (socket) {
-
       agtIdsocketId[selectedAgent] = socket.id;
       console.log("Mensaje Server->Cliente enviado");
       socket.emit('news', { message: messageText, agentId: selectedAgent, call_id: call_id, recipient_id: recipientID });
@@ -189,7 +188,7 @@ function receivedMessage(event, request, response) {
       });
       //socket.to(socket.id).emit('news', { message: messageText });
       //socket.broadcast.to(socket.id).emit('news', { message: messageText });
-    });
+
 //********************************************************
     switch (messageText) {
       case 'file':
@@ -202,6 +201,7 @@ function receivedMessage(event, request, response) {
     sendTextMessage(senderID, "Message with attachment received", 1);
   }
 }
+});
 
 function getFechaHora() {
   var fecha = new Date();
