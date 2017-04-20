@@ -143,10 +143,10 @@ function receivedMessage(event, request, response) {
           call_id = result.call_id;
           console.log("callid obtenido de la bd: " + call_id);
         }
+        event.callid = call_id;
+        saveTextMessage(event, selectedAgent);// GUARDO EN MYSQL EL MENSAJE QUE ENVIA EL CLIENTE DESDE FB
     });
   });
-  event.callid = call_id;
-  saveTextMessage(event, selectedAgent);// GUARDO EN MYSQL EL MENSAJE QUE ENVIA EL CLIENTE DESDE FB
   //------------------------------------------------------------
   if (isEcho) {
     //console.log("Received echo for message %s and app %d with metadata %s",
