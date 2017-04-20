@@ -138,10 +138,8 @@ function receivedMessage(event, request, response) {
         }
         if(result == "") {
           call_id = parseInt(getRandomArbitrary(1000, 1999999));
-          console.log("callid geneado aleatoriamente, no existe en bd el id: " + call_id);
         } else {
           call_id = result[0].call_id
-          console.log("callid obtenido de la bd: " + call_id);
         }
         event.callid = call_id;
         saveTextMessage(event, selectedAgent);// GUARDO EN MYSQL EL MENSAJE QUE ENVIA EL CLIENTE DESDE FB
@@ -165,7 +163,7 @@ function receivedMessage(event, request, response) {
     io.on('connection', function (socket) {
 
       agtIdsocketId[selectedAgent] = socket.id;
-      console.log(" mensaje WEBSOCKET enviado ");
+      console.log("Mensaje Server->Cliente enviado");
       socket.emit('news', { message: messageText, agentId: selectedAgent, call_id: call_id, recipient_id: recipientID });
 
       socket.on('responseDialog', function(data) {
@@ -187,6 +185,7 @@ function receivedMessage(event, request, response) {
             return;
         });
         var randSendingTime = getRandomArbitrary(2000, 9000);
+        console.log("Mensaje Cliente->Server enviado");
         setTimeout(function() {sendTextMessage(senderID, row.text_message, 0);}, randSendingTime);
       });
       //socket.to(socket.id).emit('news', { message: messageText });
