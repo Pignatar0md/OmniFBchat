@@ -136,7 +136,6 @@ function receivedMessage(event, request, response) {
       if (err){
         console.log("ERROR AL ejecutar select de call_id mysql: "+err);
         }
-        return;
         if(!result.call_id) {
           call_id = parseInt(getRandomArbitrary(1000, 1999999));
           console.log("callid geneado aleatoriamente, no existe en bd el id: " + call_id);
