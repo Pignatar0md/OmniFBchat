@@ -78,7 +78,7 @@ app.post('/webhook', function (req, res) {
         if (messagingEvent.option) {
           receivedAuthentication(messagingEvent);
         } else if (messagingEvent.message) {
-          receivedMessage(messagingEvent, req, res);
+          receivedMessage(messagingEvent, req, res, IOsocket);
         } else if (messagingEvent.delivery) {
           receivedDeliveryConfirmation(messagingEvent);
         } else if (messagingEvent.postback) {
@@ -91,13 +91,38 @@ app.post('/webhook', function (req, res) {
     res.sendStatus(200);
   }
 });
+var IOsocket = "";
+io.on('connection', function (socket) {
+  IOsocket = socket;
+  socket.on('responseDialog', function(data) {
+    var time = getFechaHora();
+    var row = {
+      text_message: data.message,
+      agent_id: data.agent_id,
+      fb_username: data.fbuser_id,
+      call_id: data.call_id,
+      time_i: time[1],
+      date_i: time[0],
+      recipient_id: data.recipient_id
+    };
+    // inserto el mensaje enviado por el agente OmniLeads a usuario de Facebook
+    mysqlCnn.query('insert into active_calls set ?', row, function(err, result) {
+      if (err){
+        console.log("ERROR AL ejecutar insert mysql: "+err);
+        }
+        return;
+    });
+    var randSendingTime = getRandomArbitrary(2000, 9000);
+    console.log("Mensaje Cliente->Server enviado");
+    setTimeout(function() {sendTextMessage(senderID, row.text_message, 0);}, randSendingTime);
+  });
+});
 
 function getRandomArbitrary(min, max) {
     return Math.random() * (max - min) + min;
 }
 
-io.on('connection', function (socket) {
-function receivedMessage(event, request, response) {
+function receivedMessage(event, request, response, socket) {
   var senderID = event.sender.id;
   var recipientID = event.recipient.id;
   var timeOfMessage = event.timestamp;
@@ -160,32 +185,11 @@ function receivedMessage(event, request, response) {
   }
   if (messageText) {
 //*************************************************socket.io
-      agtIdsocketId[selectedAgent] = socket.id;
+      //agtIdsocketId[selectedAgent] = socket.id;
       console.log("Mensaje Server->Cliente enviado");
       socket.emit('news', { message: messageText, agentId: selectedAgent, call_id: call_id, recipient_id: recipientID });
 
-      socket.on('responseDialog', function(data) {
-        var time = getFechaHora();
-        var row = {
-          text_message: data.message,
-          agent_id: data.agent_id,
-          fb_username: data.fbuser_id,
-          call_id: data.call_id,
-          time_i: time[1],
-          date_i: time[0],
-          recipient_id: data.recipient_id
-        };
-        // inserto el mensaje enviado por el agente OmniLeads a usuario de Facebook
-        mysqlCnn.query('insert into active_calls set ?', row, function(err, result) {
-          if (err){
-            console.log("ERROR AL ejecutar insert mysql: "+err);
-            }
-            return;
-        });
-        var randSendingTime = getRandomArbitrary(2000, 9000);
-        console.log("Mensaje Cliente->Server enviado");
-        setTimeout(function() {sendTextMessage(senderID, row.text_message, 0);}, randSendingTime);
-      });
+
       //socket.to(socket.id).emit('news', { message: messageText });
       //socket.broadcast.to(socket.id).emit('news', { message: messageText });
 
@@ -201,7 +205,6 @@ function receivedMessage(event, request, response) {
     sendTextMessage(senderID, "Message with attachment received", 1);
   }
 }
-});
 
 function getFechaHora() {
   var fecha = new Date();
