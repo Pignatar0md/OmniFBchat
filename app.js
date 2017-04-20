@@ -127,28 +127,27 @@ function receivedMessage(event, request, response) {
       onlineAgents[i] = result.rows[i].agente_id;
     }
     selectedAgent = onlineAgents[Math.floor(Math.random() * onlineAgents.length)];
-    // Verifico si call_id no existe
-    var mysqlArgs = [recipientID, senderID, selectedAgent];
-    console.log(mysqlArgs);
-    mysqlCnn.query('select call_id from active_calls where recipient_id like ? and fb_username like ? and agent_id like ?',
-     mysqlArgs,
-     function(err, result) {
-      if (err){
-        console.log("ERROR AL ejecutar select de call_id mysql: "+err);
-        }
-        return;
-        if(!result.call_id) {
-          call_id = parseInt(getRandomArbitrary(1000, 1999999));
-        } else {
-          call_id = result.call_id;
-        }
-    });
-
-
-
-    event.callid = call_id;
-    saveTextMessage(event, selectedAgent);// GUARDO EN MYSQL EL MENSAJE QUE ENVIA EL CLIENTE DESDE FB
   });
+  // Verifico si call_id no existe
+  var mysqlArgs = [recipientID, senderID, selectedAgent];
+  console.log(mysqlArgs);
+  mysqlCnn.query('select call_id from active_calls where recipient_id like ? and fb_username like ? and agent_id like ?',
+   mysqlArgs,
+   function(err, result) {
+    if (err){
+      console.log("ERROR AL ejecutar select de call_id mysql: "+err);
+      }
+      return;
+      if(!result.call_id) {
+        call_id = parseInt(getRandomArbitrary(1000, 1999999));
+        console.log("callid geneado aleatoriamente, no existe en bd el id: " + call_id);
+      } else {
+        call_id = result.call_id;
+        console.log("callid obtenido de la bd: " + call_id);
+      }
+  });
+  event.callid = call_id;
+  saveTextMessage(event, selectedAgent);// GUARDO EN MYSQL EL MENSAJE QUE ENVIA EL CLIENTE DESDE FB
   //------------------------------------------------------------
   if (isEcho) {
     //console.log("Received echo for message %s and app %d with metadata %s",
