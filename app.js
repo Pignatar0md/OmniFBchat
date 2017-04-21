@@ -125,7 +125,6 @@ function getRandomArbitrary(min, max) {
 }
 
 function receivedMessage(event, request, response, socket) {
-  console.log(event);
   senderID = event.sender.id;
   var recipientID = event.recipient.id;
   var timeOfMessage = event.timestamp;
