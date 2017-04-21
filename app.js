@@ -104,7 +104,8 @@ io.on('connection', function (socket) {
       call_id: data.call_id,
       time_i: time[1],
       date_i: time[0],
-      recipient_id: data.recipient_id
+      recipient_id: data.recipient_id,
+      send_flag: 'o'
     };
     // inserto el mensaje enviado por el agente OmniLeads a usuario de Facebook
     mysqlCnn.query('insert into active_calls set ?', row, function(err, result) {
@@ -248,7 +249,8 @@ function saveTextMessage(evt, agent) {
     time_i: time[1],
     date_i: time[0],
     call_id: callid,
-    agent_id: agent
+    agent_id: agent,
+    send_flag: 'f'
   };
   //inserto el mensaje que viene desde un usuario de facebook a un agente de OmniLeads
   mysqlCnn.query('insert into active_calls set ?', row, function(err, result) {
