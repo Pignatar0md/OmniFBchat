@@ -124,6 +124,7 @@ function getRandomArbitrary(min, max) {
 }
 
 function receivedMessage(event, request, response, socket) {
+  console.log(event);
   senderID = event.sender.id;
   var recipientID = event.recipient.id;
   var timeOfMessage = event.timestamp;
@@ -190,7 +191,6 @@ function receivedMessage(event, request, response, socket) {
   if (messageText) {
 //*************************************************socket.io
       //agtIdsocketId[selectedAgent] = socket.id;
-
 
       //socket.to(socket.id).emit('news', { message: messageText });
       //socket.broadcast.to(socket.id).emit('news', { message: messageText });
