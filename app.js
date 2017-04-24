@@ -170,9 +170,10 @@ function receivedMessage(event, request, response, socket) {
           call_id = result[0].call_id
         }
         event.callid = call_id;
-        saveTextMessage(event, selectedAgent);// GUARDO EN MYSQL EL MENSAJE QUE ENVIA EL CLIENTE DESDE FB
+        var DatosEnJson = { message: messageText, agentId: selectedAgent, call_id: call_id, recipient_id: recipientID };
+        saveTextMessage(event, selectedAgent, socket, DatosEnJson);// GUARDO EN MYSQL EL MENSAJE QUE ENVIA EL CLIENTE DESDE FB
         console.log("Mensaje Server->Cliente enviado");
-        socket.emit('news', { message: messageText, agentId: selectedAgent, call_id: call_id, recipient_id: recipientID });
+        //socket.emit('news', { message: messageText, agentId: selectedAgent, call_id: call_id, recipient_id: recipientID });
     });
   });
   //------------------------------------------------------------
@@ -237,7 +238,7 @@ function getFechaHora() {
   return tiempo;
 }
 
-function saveTextMessage(evt, agent) {
+function saveTextMessage(evt, agent, socket, jsonData) {
   var callid = evt.callid;
   var message = evt.message;
   var time = getFechaHora();
@@ -256,6 +257,7 @@ function saveTextMessage(evt, agent) {
     if (err){
       console.log("ERROR AL ejecutar insert mysql: "+err);
       }
+      socket.emit('news', jsonData);
       return;
   });
   //----------------------------------------------------------------------------
