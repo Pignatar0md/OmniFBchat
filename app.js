@@ -35,7 +35,7 @@ app.use(bodyParser.urlencoded({
 //--------------------------------------------------------------------- save user->message to mysql
 var mysqlCnn = mysql.createPool({
   connectionLimit : 10,
-  host: '172.16.20.42',
+  host: '172.16.20.46',
   user: 'nodefb',
   password: 'H0l4ho1a321',
   database:'facebook'
@@ -170,10 +170,9 @@ function receivedMessage(event, request, response, socket) {
           call_id = result[0].call_id
         }
         event.callid = call_id;
+        saveTextMessage(event, selectedAgent);// GUARDO EN MYSQL EL MENSAJE QUE ENVIA EL CLIENTE DESDE FB
         console.log("Mensaje Server->Cliente enviado");
         socket.emit('news', { message: messageText, agentId: selectedAgent, call_id: call_id, recipient_id: recipientID });
-
-        saveTextMessage(event, selectedAgent);// GUARDO EN MYSQL EL MENSAJE QUE ENVIA EL CLIENTE DESDE FB
     });
   });
   //------------------------------------------------------------
