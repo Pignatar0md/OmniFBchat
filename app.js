@@ -14,20 +14,18 @@ var senderID = "";
 //-----------------------------------------------------POSTGRE
 const postgrePool = require('./lib/pgdb');
 //ask for a client from the pool
-//************************************socket.io
-var svrForSocketIO = require('http').Server(express);
-svrForSocketIO.listen(8082);
-var io = require('socket.io')(svrForSocketIO);
-//*********************************************
-var token = "EAAFfj6S1khYBAPv2kbEbjGuCzgYMwMKGZAGD9BBJZC9NJktaIRpSwjqKLxEDGCjDGUSQjQzNKzxFKRLMHFmhg2ZBgKfKH7AAP8IuiVUJPYqZC223PRZChwpKayOdUIWgrXbkaToKAqkExZCATvT6pTSf0UP4mYRiw3RiRMX9k0swZDZD";
-var pass = "my_password_here";
-
 var privateKey  = fs.readFileSync('./www.freetech.com.ar.key', 'utf8');
 var certificate = fs.readFileSync('./www_freetech_com_ar.crt', 'utf8');
 var serverCrt = fs.readFileSync('./DigiCertCA.crt', 'utf8');
 
 var credentials = {ca: serverCrt, cert: certificate, key: privateKey};
-
+//************************************socket.io
+var svrForSocketIO = require('https').Server(credentials,express);
+svrForSocketIO.listen(8082);
+var io = require('socket.io')(svrForSocketIO);
+//*********************************************
+var token = "EAAFfj6S1khYBAPv2kbEbjGuCzgYMwMKGZAGD9BBJZC9NJktaIRpSwjqKLxEDGCjDGUSQjQzNKzxFKRLMHFmhg2ZBgKfKH7AAP8IuiVUJPYqZC223PRZChwpKayOdUIWgrXbkaToKAqkExZCATvT6pTSf0UP4mYRiw3RiRMX9k0swZDZD";
+var pass = "my_password_here";
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: true
