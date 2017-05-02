@@ -55,26 +55,6 @@ var httpsServer = https.createServer(credentials, app);
 var svrForSocketIO = https.createServer(credentials, app);
 var io = require('socket.io')(svrForSocketIO);
 svrForSocketIO.listen(8082);
-/*app.get("/", function (req, res) {
-  res.send('<!doctype html><html><head></head><body><h1>'+
-             'Mi primer pagina</h1></body></html>');
-});
-app.post("/", function (req, res) {
-  res.send('<!doctype html><html><head></head><body><h1>'+
-             'Mi primer pagina</h1></body></html>');
-});*/
-app.get('/getmessages', function(req, res) {
-  var call_id = [req.body.callid];
-  mysqlCnn.query('select fb_username, text_message, call_id, recipient_id,send_flag from active_calls where call_id = ? order by date_i, time_i',
-  call_id, function(err, result) {
-    if (err){
-      console.log("ERROR AL ejecutar insert mysql: "+err);
-      }
-    if(result.length > 0) {
-      res.send({dialog:result[0]});
-    }
-  });
-});
 
 app.get('/webhook', function(req, res) {
   if (req.query['hub.mode'] === 'subscribe' &&
@@ -135,7 +115,7 @@ io.on('connection', function (socket) {
         }
         return;
     });
-    var randSendingTime = getRandomArbitrary(2000, 9000);
+    var randSendingTime = getRandomArbitrary(2000, 15000);
     console.log("Mensaje Cliente->Server enviado");
     setTimeout(function() {sendTextMessage(senderID, row.text_message, 0);}, randSendingTime);
   });
