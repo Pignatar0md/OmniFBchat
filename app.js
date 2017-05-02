@@ -24,7 +24,7 @@ var svrForSocketIO = require('https').Server(credentials,express);
 svrForSocketIO.listen(8082);
 var io = require('socket.io')(svrForSocketIO);
 //*********************************************
-var token = "EAAFfj6S1khYBAPv2kbEbjGuCzgYMwMKGZAGD9BBJZC9NJktaIRpSwjqKLxEDGCjDGUSQjQzNKzxFKRLMHFmhg2ZBgKfKH7AAP8IuiVUJPYqZC223PRZChwpKayOdUIWgrXbkaToKAqkExZCATvT6pTSf0UP4mYRiw3RiRMX9k0swZDZD";
+var token = "EAAFE5ZCAyP2oBAFee4EfoVGz6ZAIU7HLv0T2bIXKikhYXxiSwD4Ujb3oU6198g4H9P9qBuckY2AwOl6x9j1tWieaURx3RhyGjpt8FUxWBReWEZCu4iVMC9gvaWGZAmn320FdkFPKMicy910p2ln4WxQYEDIlF0ZBJAFnMQaZCTeQZDZD";
 var pass = "my_password_here";
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -33,10 +33,18 @@ app.use(bodyParser.urlencoded({
 //--------------------------------------------------------------------- save user->message to mysql
 var mysqlCnn = mysql.createPool({
   connectionLimit : 10,
+  queueLimit: 30,
+  acquireTimeout: 1000000,
   host: '172.16.20.46',
   user: 'nodefb',
   password: 'H0l4ho1a321',
   database:'facebook'
+
+  /*
+  host: 'localhost',
+  user: 'root',
+  password: '098098ZZZ',
+  */
 });
 
 mysqlCnn.getConnection(function(err) {
@@ -54,6 +62,18 @@ app.post("/", function (req, res) {
   res.send('<!doctype html><html><head></head><body><h1>'+
              'Mi primer pagina</h1></body></html>');
 });*/
+app.get('/getmessages', function(req, res) {
+  var call_id = [req.body.callid];
+  mysqlCnn.query('select fb_username, text_message, call_id, recipient_id,send_flag from active_calls where call_id = ? order by date_i, time_i',
+  call_id, function(err, result) {
+    if (err){
+      console.log("ERROR AL ejecutar insert mysql: "+err);
+      }
+    if(result.length > 0) {
+      res.send({dialog:result[0]});
+    }
+  });
+});
 app.get('/webhook', function(req, res) {
   if (req.query['hub.mode'] === 'subscribe' &&
       req.query['hub.verify_token'] === pass) {
@@ -165,7 +185,7 @@ function receivedMessage(event, request, response, socket) {
         if(result == "") {
           call_id = parseInt(getRandomArbitrary(1000, 1999999));
         } else {
-          call_id = result[0].call_id
+          call_id = result[0].call_id;
         }
         event.callid = call_id;
         var DatosEnJson = { message: messageText, agentId: selectedAgent, call_id: call_id, recipient_id: recipientID };
@@ -312,4 +332,5 @@ function callSendAPI(messageData) {
 }
 
 httpServer.listen(8080);
+//httpServer.listen(8081);
 httpsServer.listen(8443);
