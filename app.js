@@ -14,18 +14,20 @@ var senderID = "";
 //-----------------------------------------------------POSTGRE
 const postgrePool = require('./lib/pgdb');
 //ask for a client from the pool
+//************************************socket.io
+/*var svrForSocketIO = require('http').Server(express);
+svrForSocketIO.listen(8082);
+var io = require('socket.io')(svrForSocketIO);*/
+//*********************************************
+var token = "EAAFfj6S1khYBAPv2kbEbjGuCzgYMwMKGZAGD9BBJZC9NJktaIRpSwjqKLxEDGCjDGUSQjQzNKzxFKRLMHFmhg2ZBgKfKH7AAP8IuiVUJPYqZC223PRZChwpKayOdUIWgrXbkaToKAqkExZCATvT6pTSf0UP4mYRiw3RiRMX9k0swZDZD";
+var pass = "my_password_here";
+
 var privateKey  = fs.readFileSync('./www.freetech.com.ar.key', 'utf8');
 var certificate = fs.readFileSync('./www_freetech_com_ar.crt', 'utf8');
 var serverCrt = fs.readFileSync('./DigiCertCA.crt', 'utf8');
 
 var credentials = {ca: serverCrt, cert: certificate, key: privateKey};
-//************************************socket.io
-var svrForSocketIO = require('https').Server(credentials,express);
-svrForSocketIO.listen(8082);
-var io = require('socket.io')(svrForSocketIO);
-//*********************************************
-var token = "EAAFE5ZCAyP2oBAFee4EfoVGz6ZAIU7HLv0T2bIXKikhYXxiSwD4Ujb3oU6198g4H9P9qBuckY2AwOl6x9j1tWieaURx3RhyGjpt8FUxWBReWEZCu4iVMC9gvaWGZAmn320FdkFPKMicy910p2ln4WxQYEDIlF0ZBJAFnMQaZCTeQZDZD";
-var pass = "my_password_here";
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: true
@@ -35,16 +37,10 @@ var mysqlCnn = mysql.createPool({
   connectionLimit : 10,
   queueLimit: 30,
   acquireTimeout: 1000000,
-  host: '172.16.20.46',
-  user: 'nodefb',
-  password: 'H0l4ho1a321',
-  database:'facebook'
-
-  /*
   host: 'localhost',
   user: 'root',
   password: '098098ZZZ',
-  */
+  database:'facebook'
 });
 
 mysqlCnn.getConnection(function(err) {
@@ -54,6 +50,11 @@ mysqlCnn.getConnection(function(err) {
 
 var httpServer = http.createServer(app);
 var httpsServer = https.createServer(credentials, app);
+
+//var svrForSocketIO = require('https').Server(credentials, app);
+var svrForSocketIO = https.createServer(credentials, app);
+var io = require('socket.io')(svrForSocketIO);
+svrForSocketIO.listen(8082);
 /*app.get("/", function (req, res) {
   res.send('<!doctype html><html><head></head><body><h1>'+
              'Mi primer pagina</h1></body></html>');
@@ -74,6 +75,7 @@ app.get('/getmessages', function(req, res) {
     }
   });
 });
+
 app.get('/webhook', function(req, res) {
   if (req.query['hub.mode'] === 'subscribe' &&
       req.query['hub.verify_token'] === pass) {
@@ -112,6 +114,7 @@ app.post('/webhook', function (req, res) {
 });
 var IOsocket = "";
 io.on('connection', function (socket) {
+  console.log("cliente Socket.IO conectado");
   IOsocket = socket;
   socket.on('responseDialog', function(data) {
     var time = getFechaHora();
@@ -331,6 +334,5 @@ function callSendAPI(messageData) {
   });
 }
 
-httpServer.listen(8080);
-//httpServer.listen(8081);
+httpServer.listen(8081);
 httpsServer.listen(8443);
