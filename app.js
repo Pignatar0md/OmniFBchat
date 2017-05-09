@@ -13,12 +13,6 @@ var agtIdsocketId = new Array();
 var senderID = "";
 //-----------------------------------------------------POSTGRE
 const postgrePool = require('./lib/pgdb');
-//ask for a client from the pool
-//************************************socket.io
-/*var svrForSocketIO = require('http').Server(express);
-svrForSocketIO.listen(8082);
-var io = require('socket.io')(svrForSocketIO);*/
-//*********************************************
 var token = "EAAFfj6S1khYBAPv2kbEbjGuCzgYMwMKGZAGD9BBJZC9NJktaIRpSwjqKLxEDGCjDGUSQjQzNKzxFKRLMHFmhg2ZBgKfKH7AAP8IuiVUJPYqZC223PRZChwpKayOdUIWgrXbkaToKAqkExZCATvT6pTSf0UP4mYRiw3RiRMX9k0swZDZD";
 var pass = "my_password_here";
 
@@ -51,7 +45,6 @@ mysqlCnn.getConnection(function(err) {
 var httpServer = http.createServer(app);
 var httpsServer = https.createServer(credentials, app);
 
-//var svrForSocketIO = require('https').Server(credentials, app);
 var svrForSocketIO = https.createServer(credentials, app);
 var io = require('socket.io')(svrForSocketIO);
 svrForSocketIO.listen(8082);
@@ -174,7 +167,6 @@ function receivedMessage(event, request, response, socket) {
         var DatosEnJson = { message: messageText, agentId: selectedAgent, call_id: call_id, recipient_id: recipientID };
         saveTextMessage(event, selectedAgent, socket, DatosEnJson);// GUARDO EN MYSQL EL MENSAJE QUE ENVIA EL CLIENTE DESDE FB
         console.log("Mensaje Server->Cliente enviado");
-        //socket.emit('news', { message: messageText, agentId: selectedAgent, call_id: call_id, recipient_id: recipientID });
     });
   });
   //------------------------------------------------------------
@@ -190,14 +182,6 @@ function receivedMessage(event, request, response, socket) {
     return;
   }
   if (messageText) {
-//*************************************************socket.io
-      //agtIdsocketId[selectedAgent] = socket.id;
-
-
-      //socket.to(socket.id).emit('news', { message: messageText });
-      //socket.broadcast.to(socket.id).emit('news', { message: messageText });
-
-//********************************************************
     switch (messageText) {
       case 'file':
         sendFileMessage(senderID);

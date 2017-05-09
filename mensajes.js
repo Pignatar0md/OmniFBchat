@@ -74,14 +74,14 @@ app.get('/movemessages', function(req, res) {
     if(result.length > 0) {
       for(var i = 0; i < result.length; i++) {
         var row = {
-          recipient_id: result.[i].recipient_id,
-          fb_username: result.[i].fb_username,
-          text_message: result.[i].text_message,
-          agent_id: result.[i].agent_id,
-          send_flag: result.[i].send_flag,
-          time_i: result.[i].time_i,
-          date_i: result.[i].date_i,
-          call_id: result.[i].call_id
+          recipient_id: result[i].recipient_id,
+          fb_username: result[i].fb_username,
+          text_message: result[i].text_message,
+          agent_id: result[i].agent_id,
+          send_flag: result[i].send_flag,
+          time_i: result[i].time_i,
+          date_i: result[i].date_i,
+          call_id: result[i].call_id
         };
         mysqlCnn.query('insert into log_messages set ?', row, function(err, result) {
           if (err){
