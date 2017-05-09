@@ -35,9 +35,9 @@ var mysqlCnn = mysql.createPool({
   connectionLimit : 10,
   queueLimit: 30,
   acquireTimeout: 1000000,
-  host: '172.16.20.46',
-  user: 'nodefb',
-  password: 'H0l4ho1a321',
+  host: 'localhost',
+  user: 'root',
+  password: '098098ZZZ',
   database:'facebook'
 
   /*
