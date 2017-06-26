@@ -140,7 +140,8 @@ function receivedMessage(event, request, response, socket) {
   var selectedAgent;
   var call_id;
   var mysqlArgs = [];
-  postgrePool.query('SELECT id as agente_id from ominicontacto_app_agenteprofile where estado = 2',
+  postgrePool.query('SELECT agp.id as agente_id from ominicontacto_app_agenteprofile agp join ominicontacto_app_agenteprofile_modulos agpm' +
+  ' on agp.id = agpm.agenteprofile_id and estado = 2 and agpm.modulo_id = 2',
   function (err, result) {
     if (err) {
       return console.log(err);
